@@ -154,10 +154,8 @@ export default function App() {
       <main className="absolute top-16 left-0 right-0 bottom-0 flex flex-col md:flex-row">
         {/* Main content area */}
         <section className="flex-1 flex flex-col md:mr-80 lg:mr-96">
-          <section className="flex-1 px-2 md:px-4 overflow-y-auto">
-            <EventLog events={events} />
-          </section>
-          <section className="h-24 md:h-32 p-2 md:p-4 border-t md:border-t-0">
+          {/* Session controls at the top for mobile */}
+          <section className="h-20 md:h-24 p-2 md:p-4 border-b md:border-b-0 md:order-last">
             <SessionControls
               startSession={startSession}
               stopSession={stopSession}
@@ -166,6 +164,10 @@ export default function App() {
               events={events}
               isSessionActive={isSessionActive}
             />
+          </section>
+          {/* Event log below controls on mobile */}
+          <section className="flex-1 px-2 md:px-4 overflow-y-auto">
+            <EventLog events={events} />
           </section>
         </section>
         {/* Tool panel - responsive sidebar */}
