@@ -3,6 +3,7 @@ import logo from "/assets/openai-logomark.svg";
 import EventLog from "./EventLog";
 import SessionControls from "./SessionControls";
 import ToolPanel from "./ToolPanel";
+import ConversationDisplay from "./ConversationDisplay";
 
 export default function App() {
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -165,7 +166,11 @@ export default function App() {
               isSessionActive={isSessionActive}
             />
           </section>
-          {/* Event log below controls on mobile */}
+          {/* Conversation display - mobile only */}
+          <section className="md:hidden h-64 border-b">
+            <ConversationDisplay events={events} isSessionActive={isSessionActive} />
+          </section>
+          {/* Event log below conversation on mobile, main content on desktop */}
           <section className="flex-1 px-2 md:px-4 overflow-y-auto">
             <EventLog events={events} />
           </section>
