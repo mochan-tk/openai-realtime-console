@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import logo from "/assets/openai-logomark.svg";
+import logo from "/assets/miniapp_icon_green.png";
 import EventLog from "./EventLog";
 import SessionControls from "./SessionControls";
 import ToolPanel from "./ToolPanel";
@@ -149,7 +149,7 @@ export default function App() {
       <nav className="absolute top-0 left-0 right-0 h-16 flex items-center z-10">
         <div className="flex items-center gap-2 md:gap-4 w-full m-2 md:m-4 pb-2 border-0 border-b border-solid border-gray-200">
           <img style={{ width: "20px" }} className="md:w-6" src={logo} />
-          <h1 className="text-sm md:text-base">realtime console</h1>
+          <h1 className="text-sm md:text-base">デモ・LINEミニアプリ（生成AI・リアルタイム会話）</h1>
         </div>
       </nav>
       <main className="absolute top-16 left-0 right-0 bottom-0 flex flex-col md:flex-row">
