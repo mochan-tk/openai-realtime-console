@@ -7,17 +7,17 @@ function Event({ event, timestamp }) {
   const isClient = event.event_id && !event.event_id.startsWith("event_");
 
   return (
-    <div className="flex flex-col gap-2 p-2 rounded-md bg-gray-50">
+    <div className="flex flex-col gap-2 p-2 md:p-3 rounded-md bg-gray-50">
       <div
         className="flex items-center gap-2 cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         {isClient ? (
-          <ArrowDown className="text-blue-400" />
+          <ArrowDown className="text-blue-400 w-4 h-4" />
         ) : (
-          <ArrowUp className="text-green-400" />
+          <ArrowUp className="text-green-400 w-4 h-4" />
         )}
-        <div className="text-sm text-gray-500">
+        <div className="text-xs md:text-sm text-gray-500 break-words">
           {isClient ? "client:" : "server:"}
           &nbsp;{event.type} | {timestamp}
         </div>
@@ -27,7 +27,7 @@ function Event({ event, timestamp }) {
           isExpanded ? "block" : "hidden"
         }`}
       >
-        <pre className="text-xs">{JSON.stringify(event, null, 2)}</pre>
+        <pre className="text-xs break-words whitespace-pre-wrap">{JSON.stringify(event, null, 2)}</pre>
       </div>
     </div>
   );
@@ -53,9 +53,9 @@ export default function EventLog({ events }) {
   });
 
   return (
-    <div className="flex flex-col gap-2 overflow-x-auto">
+    <div className="flex flex-col gap-2 overflow-x-auto p-2 md:p-0">
       {events.length === 0 ? (
-        <div className="text-gray-500">Awaiting events...</div>
+        <div className="text-gray-500 text-sm md:text-base">Awaiting events...</div>
       ) : (
         eventsToDisplay
       )}

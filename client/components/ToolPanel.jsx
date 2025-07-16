@@ -43,10 +43,10 @@ function FunctionCallOutput({ functionCallOutput }) {
   const colorBoxes = colors.map((color) => (
     <div
       key={color}
-      className="w-full h-16 rounded-md flex items-center justify-center border border-gray-200"
+      className="w-full h-12 md:h-16 rounded-md flex items-center justify-center border border-gray-200"
       style={{ backgroundColor: color }}
     >
-      <p className="text-sm font-bold text-black bg-slate-100 rounded-md p-2 border border-black">
+      <p className="text-xs md:text-sm font-bold text-black bg-slate-100 rounded-md p-1 md:p-2 border border-black">
         {color}
       </p>
     </div>
@@ -54,9 +54,9 @@ function FunctionCallOutput({ functionCallOutput }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <p>Theme: {theme}</p>
+      <p className="text-sm md:text-base">Theme: {theme}</p>
       {colorBoxes}
-      <pre className="text-xs bg-gray-100 rounded-md p-2 overflow-x-auto">
+      <pre className="text-xs bg-gray-100 rounded-md p-2 overflow-x-auto break-words whitespace-pre-wrap">
         {JSON.stringify(functionCallOutput, null, 2)}
       </pre>
     </div>
@@ -116,16 +116,16 @@ export default function ToolPanel({
 
   return (
     <section className="h-full w-full flex flex-col gap-4">
-      <div className="h-full bg-gray-50 rounded-md p-4">
-        <h2 className="text-lg font-bold">Color Palette Tool</h2>
+      <div className="h-full bg-gray-50 rounded-md p-3 md:p-4">
+        <h2 className="text-base md:text-lg font-bold mb-2">Color Palette Tool</h2>
         {isSessionActive ? (
           functionCallOutput ? (
             <FunctionCallOutput functionCallOutput={functionCallOutput} />
           ) : (
-            <p>Ask for advice on a color palette...</p>
+            <p className="text-sm md:text-base">Ask for advice on a color palette...</p>
           )
         ) : (
-          <p>Start the session to use this tool...</p>
+          <p className="text-sm md:text-base">Start the session to use this tool...</p>
         )}
       </div>
     </section>

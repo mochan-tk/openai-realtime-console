@@ -145,18 +145,19 @@ export default function App() {
 
   return (
     <>
-      <nav className="absolute top-0 left-0 right-0 h-16 flex items-center">
-        <div className="flex items-center gap-4 w-full m-4 pb-2 border-0 border-b border-solid border-gray-200">
-          <img style={{ width: "24px" }} src={logo} />
-          <h1>realtime console</h1>
+      <nav className="absolute top-0 left-0 right-0 h-16 flex items-center z-10">
+        <div className="flex items-center gap-2 md:gap-4 w-full m-2 md:m-4 pb-2 border-0 border-b border-solid border-gray-200">
+          <img style={{ width: "20px" }} className="md:w-6" src={logo} />
+          <h1 className="text-sm md:text-base">realtime console</h1>
         </div>
       </nav>
-      <main className="absolute top-16 left-0 right-0 bottom-0">
-        <section className="absolute top-0 left-0 right-[380px] bottom-0 flex">
-          <section className="absolute top-0 left-0 right-0 bottom-32 px-4 overflow-y-auto">
+      <main className="absolute top-16 left-0 right-0 bottom-0 flex flex-col md:flex-row">
+        {/* Main content area */}
+        <section className="flex-1 flex flex-col md:mr-80 lg:mr-96">
+          <section className="flex-1 px-2 md:px-4 overflow-y-auto">
             <EventLog events={events} />
           </section>
-          <section className="absolute h-32 left-0 right-0 bottom-0 p-4">
+          <section className="h-24 md:h-32 p-2 md:p-4 border-t md:border-t-0">
             <SessionControls
               startSession={startSession}
               stopSession={stopSession}
@@ -167,7 +168,8 @@ export default function App() {
             />
           </section>
         </section>
-        <section className="absolute top-0 w-[380px] right-0 bottom-0 p-4 pt-0 overflow-y-auto">
+        {/* Tool panel - responsive sidebar */}
+        <section className="hidden md:block absolute top-0 w-80 lg:w-96 right-0 bottom-0 p-4 pt-0 overflow-y-auto border-l border-gray-200">
           <ToolPanel
             sendClientEvent={sendClientEvent}
             sendTextMessage={sendTextMessage}
@@ -175,6 +177,44 @@ export default function App() {
             isSessionActive={isSessionActive}
           />
         </section>
+        {/* Mobile tool panel toggle */}
+        <div className="md:hidden fixed bottom-4 right-4 z-20">
+          <button
+            onClick={() => {
+              const toolPanel = document.getElementById('mobile-tool-panel');
+              toolPanel.classList.toggle('hidden');
+            }}
+            className="bg-blue-600 text-white p-3 rounded-full shadow-lg"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+        {/* Mobile tool panel overlay */}
+        <div id="mobile-tool-panel" className="hidden md:hidden fixed inset-0 bg-black bg-opacity-50 z-30">
+          <div className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-white p-4 overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Tools</h2>
+              <button
+                onClick={() => {
+                  document.getElementById('mobile-tool-panel').classList.add('hidden');
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <ToolPanel
+              sendClientEvent={sendClientEvent}
+              sendTextMessage={sendTextMessage}
+              events={events}
+              isSessionActive={isSessionActive}
+            />
+          </div>
+        </div>
       </main>
     </>
   );
