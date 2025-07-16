@@ -37,7 +37,7 @@ export default function EventLog({ events }) {
   const eventsToDisplay = [];
   let deltaEvents = {};
 
-  events.forEach((event) => {
+  events.forEach((event, index) => {
     if (event.type.endsWith("delta")) {
       if (deltaEvents[event.type]) {
         // for now just log a single event per render pass
@@ -47,8 +47,10 @@ export default function EventLog({ events }) {
       }
     }
 
+    // Use event_id + index to ensure unique keys
+    const uniqueKey = event.event_id ? `${event.event_id}_${index}` : `event_${index}`;
     eventsToDisplay.push(
-      <Event key={event.event_id} event={event} timestamp={event.timestamp} />,
+      <Event key={uniqueKey} event={event} timestamp={event.timestamp} />,
     );
   });
 

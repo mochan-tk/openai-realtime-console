@@ -6,69 +6,103 @@ export default function ConversationDisplay({ events, isSessionActive }) {
   useEffect(() => {
     if (!events || events.length === 0) return;
 
-    // 会話に関連するイベントのみを抽出
-    const relevantEvents = events.filter(event => 
-      event.type === "conversation.item.create" ||
-      event.type === "response.audio_transcript.delta" ||
-      event.type === "response.audio_transcript.done" ||
-      event.type === "response.text.delta" ||
-      event.type === "response.text.done"
-    );
+    // デバッグ用：送信されたイベントをコンソールに出力
+    console.log("ConversationDisplay: Processing", events.length, "events");
 
     const items = [];
-    let currentResponse = null;
 
-    // イベントを時系列順に並べ替え（最新が先頭なので逆順にする）
-    const sortedEvents = [...relevantEvents].reverse();
+    // 全イベントを時系列順にソート
+    const sortedEvents = [...events].sort((a, b) => {
+      const timeA = new Date(a.timestamp).getTime();
+      const timeB = new Date(b.timestamp).getTime();
+      return timeA - timeB;
+    });
 
+    // 処理済みアイテムのIDを追跡
+    const processedIds = new Set();
+
+    // イベントを順番に処理してアイテムを作成
     sortedEvents.forEach(event => {
-      if (event.type === "conversation.item.create") {
-        if (event.item && event.item.content && event.item.content[0]) {
-          const content = event.item.content[0];
-          if (content.type === "input_text") {
-            items.push({
-              id: event.item.id || event.event_id,
-              role: "user",
-              content: content.text,
-              timestamp: event.timestamp
+      // ユーザーのメッセージ作成イベント
+      if (event.type === "conversation.item.created" && event.item && event.item.role === "user") {
+        const itemId = event.item.id;
+        if (processedIds.has(itemId)) return;
+        processedIds.add(itemId);
+        
+        if (event.item.content && Array.isArray(event.item.content)) {
+          event.item.content.forEach((contentItem) => {
+            if (contentItem.type === "input_text" && contentItem.text) {
+              const userItem = {
+                id: `user_${itemId}`,
+                role: "user",
+                content: contentItem.text,
+                timestamp: event.timestamp
+              };
+              items.push(userItem);
+            } else if (contentItem.type === "input_audio") {
+              const audioContent = contentItem.transcript || "[音声入力]";
+              const userItem = {
+                id: `user_${itemId}`,
+                role: "user",
+                content: audioContent,
+                timestamp: event.timestamp
+              };
+              items.push(userItem);
+            }
+          });
+        }
+      }
+      
+      // アシスタントの音声転写完了イベント
+      else if (event.type === "response.audio_transcript.done" && event.transcript) {
+        const responseId = event.response_id;
+        const transcriptId = `assistant_audio_${responseId}`;
+        if (processedIds.has(transcriptId)) return;
+        processedIds.add(transcriptId);
+        
+        const assistantItem = {
+          id: transcriptId,
+          role: "assistant",
+          content: event.transcript,
+          timestamp: event.timestamp
+        };
+        items.push(assistantItem);
+      }
+      
+      // レスポンス完了イベント（テキスト応答用）
+      else if (event.type === "response.done" && event.response && event.response.output) {
+        const responseId = event.response.id;
+        const textId = `assistant_text_${responseId}`;
+        if (processedIds.has(textId)) return;
+        processedIds.add(textId);
+        
+        event.response.output.forEach(outputItem => {
+          if (outputItem.type === "message" && outputItem.content) {
+            outputItem.content.forEach(contentItem => {
+              if (contentItem.type === "text") {
+                const assistantItem = {
+                  id: textId,
+                  role: "assistant",
+                  content: contentItem.text,
+                  timestamp: event.timestamp
+                };
+                items.push(assistantItem);
+              }
             });
           }
-        }
-      } else if (event.type === "response.audio_transcript.delta") {
-        if (!currentResponse) {
-          currentResponse = {
-            id: event.response_id,
-            role: "assistant",
-            content: "",
-            timestamp: event.timestamp
-          };
-        }
-        currentResponse.content += event.delta || "";
-      } else if (event.type === "response.audio_transcript.done") {
-        if (currentResponse) {
-          items.push(currentResponse);
-          currentResponse = null;
-        }
-      } else if (event.type === "response.text.delta") {
-        if (!currentResponse) {
-          currentResponse = {
-            id: event.response_id,
-            role: "assistant",
-            content: "",
-            timestamp: event.timestamp
-          };
-        }
-        currentResponse.content += event.delta || "";
-      } else if (event.type === "response.text.done") {
-        if (currentResponse) {
-          items.push(currentResponse);
-          currentResponse = null;
-        }
+        });
       }
     });
 
-    // 最新の会話を上に表示するため、再度逆順にする
-    setConversationItems(items.reverse());
+    // 再度時系列順にソート
+    items.sort((a, b) => {
+      const timeA = new Date(a.timestamp).getTime();
+      const timeB = new Date(b.timestamp).getTime();
+      return timeA - timeB;
+    });
+
+    console.log("ConversationDisplay: Final conversation items", items);
+    setConversationItems(items);
   }, [events]);
 
   if (!isSessionActive) {
